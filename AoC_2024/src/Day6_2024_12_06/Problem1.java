@@ -7,7 +7,7 @@ public class Problem1 {
     
     public static void main(String[] args) {
         //read input file into a string
-		String input = inputToString("AoC_2024/src/Day6_2024_12_06/input.txt");
+		String input = inputToString("src/Day6_2024_12_06/input.txt");
 
         //position of guard
         int xpos = 0;
