@@ -48,6 +48,12 @@ public class Problem2 {
 
 		//iterate over sequence of moves
 		for(int i = 0; i < moveSequence.length(); i++) {
+			char[][] prevMap = new char[map.length][map[0].length];
+			for(int k = 0; k < map.length; k++) {
+				for(int l = 0; l < map[0].length; l++) {
+					prevMap[k][l] = map[k][l];
+				}
+			}
 			switch(moveSequence.charAt(i)) {
 				case '^':
 					if(map[xPos][yPos - 1] == '.') {
@@ -55,10 +61,14 @@ public class Problem2 {
 					} else if(map[xPos][yPos - 1] == '[') {
 						if(shoveable(map, xPos, yPos - 1, moveSequence.charAt(i))) {
 							yPos--;
+						} else {
+							map = prevMap;
 						}
 					} else if(map[xPos][yPos - 1] == ']') {
 						if(shoveable(map, xPos - 1, yPos - 1, moveSequence.charAt(i))) {
 							yPos--;
+						} else {
+							map = prevMap;
 						}
 					}
 					break;
@@ -68,10 +78,14 @@ public class Problem2 {
 					} else if(map[xPos][yPos + 1] == '[') {
 						if(shoveable(map, xPos, yPos + 1, moveSequence.charAt(i))) {
 							yPos++;
+						} else {
+							map = prevMap;
 						}
 					} else if(map[xPos][yPos + 1] == ']') {
 						if(shoveable(map, xPos - 1, yPos + 1, moveSequence.charAt(i))) {
 							yPos++;
+						} else {
+							map = prevMap;
 						}
 					}
 					break;
@@ -81,6 +95,8 @@ public class Problem2 {
 					} else if(map[xPos - 1][yPos] == ']') {
 						if(shoveable(map, xPos - 1, yPos, moveSequence.charAt(i))) {
 							xPos--;
+						} else {
+							map = prevMap;
 						}
 					}
 					break;
@@ -90,6 +106,8 @@ public class Problem2 {
 					} else if(map[xPos + 1][yPos] == '[') {
 						if(shoveable(map, xPos + 1, yPos, moveSequence.charAt(i))) {
 							xPos++;
+						} else {
+							map = prevMap;
 						}
 					}
 					break;
@@ -113,13 +131,6 @@ public class Problem2 {
 	}
 
 	private static boolean shoveable(char[][] map, int xPos, int yPos, char direction) {
-		char[][] prevMap = new char[map.length][map[0].length];
-		for(int i = 0; i < map.length; i++) {
-			for(int j = 0; j < map[0].length; j++) {
-				prevMap[i][j] = map[i][j];
-			}
-		}
-
 		switch(direction) {
 			case '^':
 				if(map[xPos][yPos - 1] == '.' && map[xPos + 1][yPos - 1] == '.') {
@@ -166,7 +177,6 @@ public class Problem2 {
 						map[xPos + 1][yPos] = '.';
 						return true;
 					} else {
-						map = prevMap;
 						return false;
 					}
 				} else {
@@ -217,7 +227,6 @@ public class Problem2 {
 						map[xPos + 1][yPos] = '.';
 						return true;
 					} else {
-						map = prevMap;
 						return false;
 					}
 				} else {
