@@ -1,0 +1,286 @@
+package Day15_2024_12_15;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class Problem2 {
+	
+	public static void main(String[] args) {
+		//read input file longo a string
+		String input = inputToString("src/Day15_2024_12_15/input.txt");
+
+		String mapString = input.split("\n\n")[0];
+		String moveSequence = input.split("\n\n")[1].trim();
+
+		int xPos = 0;
+		int yPos = 0;
+
+		//turn map into 2d char array
+		String[] mapLines = mapString.split("\n");
+		char[][] previousMap = new char[mapLines[0].length()][mapLines.length];
+		for(int i = 0; i < mapLines[0].length(); i++) {
+			for(int j = 0; j < mapLines.length; j++) {
+				previousMap[i][j] = mapLines[j].charAt(i);
+			}
+		}
+
+		//make new map with changes form problem 2
+		char[][] map = new char[previousMap.length*2][previousMap[0].length];
+		for(int i = 0; i < previousMap.length; i++) {
+			for(int j = 0; j < previousMap[0].length; j++) {
+				if(previousMap[i][j] == '#') {
+					map[i*2][j] = '#';
+					map[i*2 + 1][j] = '#';
+				} else if(previousMap[i][j] == 'O') {
+					map[i*2][j] = '[';
+					map[i*2 + 1][j] = ']';
+				} else if(previousMap[i][j] == '.') {
+					map[i*2][j] = '.';
+					map[i*2 + 1][j] = '.';
+				} else if(previousMap[i][j] == '@') {
+					map[i*2][j] = '.';
+					map[i*2 + 1][j] = '.';
+					xPos = i*2;
+					yPos = j;
+				}
+			}
+		}
+
+		//iterate over sequence of moves
+		for(int i = 0; i < moveSequence.length(); i++) {
+			switch(moveSequence.charAt(i)) {
+				case '^':
+					if(map[xPos][yPos - 1] == '.') {
+						yPos--;
+					} else if(map[xPos][yPos - 1] == '[') {
+						if(shoveable(map, xPos, yPos - 1, moveSequence.charAt(i))) {
+							yPos--;
+						}
+					} else if(map[xPos][yPos - 1] == ']') {
+						if(shoveable(map, xPos - 1, yPos - 1, moveSequence.charAt(i))) {
+							yPos--;
+						}
+					}
+					break;
+				case 'v':
+					if(map[xPos][yPos + 1] == '.') {
+						yPos++;
+					} else if(map[xPos][yPos + 1] == '[') {
+						if(shoveable(map, xPos, yPos + 1, moveSequence.charAt(i))) {
+							yPos++;
+						}
+					} else if(map[xPos][yPos + 1] == ']') {
+						if(shoveable(map, xPos - 1, yPos + 1, moveSequence.charAt(i))) {
+							yPos++;
+						}
+					}
+					break;
+				case '<':
+					if(map[xPos - 1][yPos] == '.') {
+						xPos--;
+					} else if(map[xPos - 1][yPos] == ']') {
+						if(shoveable(map, xPos - 1, yPos, moveSequence.charAt(i))) {
+							xPos--;
+						}
+					}
+					break;
+				case '>':
+					if(map[xPos + 1][yPos] == '.') {
+						xPos++;
+					} else if(map[xPos + 1][yPos] == '[') {
+						if(shoveable(map, xPos + 1, yPos, moveSequence.charAt(i))) {
+							xPos++;
+						}
+					}
+					break;
+				default:
+				System.out.println("Unkown direction");
+			}
+		}
+
+		//calculate sum of GPS coordinatea
+		int coordinateSum = 0;
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[0].length; j++) {
+				if(map[i][j] == '[') {
+					coordinateSum += (100 * j) + i;
+				}
+			}
+		}
+
+		//output
+		System.out.println("The sum of all boxes GPS coordinates is: " + coordinateSum);
+	}
+
+	private static boolean shoveable(char[][] map, int xPos, int yPos, char direction) {
+		char[][] prevMap = new char[map.length][map[0].length];
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[0].length; j++) {
+				prevMap[i][j] = map[i][j];
+			}
+		}
+
+		switch(direction) {
+			case '^':
+				if(map[xPos][yPos - 1] == '.' && map[xPos + 1][yPos - 1] == '.') {
+					map[xPos][yPos - 1] = '[';
+					map[xPos + 1][yPos - 1] = ']';
+					map[xPos][yPos] = '.';
+					map[xPos + 1][yPos] = '.';
+					return true;
+				} else if(map[xPos][yPos - 1] == '[') {
+					if(shoveable(map, xPos, yPos - 1, direction)) {
+						map[xPos][yPos - 1] = '[';
+						map[xPos + 1][yPos - 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos - 1] == ']' && map[xPos + 1][yPos - 1] == '.') {
+					if(shoveable(map, xPos - 1, yPos - 1, direction)) {
+						map[xPos][yPos - 1] = '[';
+						map[xPos + 1][yPos - 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos - 1] == '.' && map[xPos + 1][yPos - 1] == '[') {
+					if(shoveable(map, xPos + 1, yPos - 1, direction)) {
+						map[xPos][yPos - 1] = '[';
+						map[xPos + 1][yPos - 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos - 1] == ']' && map[xPos + 1][yPos - 1] == '[') {
+					if(shoveable(map, xPos - 1, yPos - 1, direction) && shoveable(map, xPos + 1, yPos - 1, direction)) {
+						map[xPos][yPos - 1] = '[';
+						map[xPos + 1][yPos - 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						map = prevMap;
+						return false;
+					}
+				} else {
+					return false;
+				}
+			case 'v':
+				if(map[xPos][yPos + 1] == '.' && map[xPos + 1][yPos + 1] == '.') {
+					map[xPos][yPos + 1] = '[';
+					map[xPos + 1][yPos + 1] = ']';
+					map[xPos][yPos] = '.';
+					map[xPos + 1][yPos] = '.';
+					return true;
+				} else if(map[xPos][yPos + 1] == '[') {
+					if(shoveable(map, xPos, yPos + 1, direction)) {
+						map[xPos][yPos + 1] = '[';
+						map[xPos + 1][yPos + 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos + 1] == ']' && map[xPos + 1][yPos + 1] == '.') {
+					if(shoveable(map, xPos - 1, yPos + 1, direction)) {
+						map[xPos][yPos + 1] = '[';
+						map[xPos + 1][yPos + 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos + 1] == '.' && map[xPos + 1][yPos + 1] == '[') {
+					if(shoveable(map, xPos + 1, yPos + 1, direction)) {
+						map[xPos][yPos + 1] = '[';
+						map[xPos + 1][yPos + 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else if(map[xPos][yPos + 1] == ']' && map[xPos + 1][yPos + 1] == '[') {
+					if(shoveable(map, xPos - 1, yPos + 1, direction) && shoveable(map, xPos + 1, yPos + 1, direction)) {
+						map[xPos][yPos + 1] = '[';
+						map[xPos + 1][yPos + 1] = ']';
+						map[xPos][yPos] = '.';
+						map[xPos + 1][yPos] = '.';
+						return true;
+					} else {
+						map = prevMap;
+						return false;
+					}
+				} else {
+					return false;
+				}
+			case '<':
+				if(map[xPos - 2][yPos] == '.') {
+					map[xPos - 2][yPos] = '[';
+					map[xPos - 1][yPos] = ']';
+					map[xPos][yPos] = '.';
+					return true;
+				} else if(map[xPos - 2][yPos] == ']') {
+					if(shoveable(map, xPos - 2, yPos, direction)) {
+						map[xPos - 2][yPos] = '[';
+						map[xPos - 1][yPos] = ']';
+						map[xPos][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			case '>':
+				if(map[xPos + 2][yPos] == '.') {
+					map[xPos + 2][yPos] = ']';
+					map[xPos + 1][yPos] = '[';
+					map[xPos][yPos] = '.';
+					return true;
+				} else if(map[xPos + 2][yPos] == '[') {
+					if(shoveable(map, xPos + 2, yPos, direction)) {
+						map[xPos + 2][yPos] = ']';
+						map[xPos + 1][yPos] = '[';
+						map[xPos][yPos] = '.';
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			default:
+				System.out.println("Unkown direction");
+				return false;
+		}
+	}
+
+	private static String inputToString(String filename) {
+        String result = "";
+        try(BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+				sb.append(line);
+				sb.append("\n");
+                line = br.readLine();
+            }
+            result = sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+        return result;
+    }
+}
