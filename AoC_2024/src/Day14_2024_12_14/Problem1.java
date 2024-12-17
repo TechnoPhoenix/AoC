@@ -6,7 +6,7 @@ import java.io.FileReader;
 public class Problem1 {
 	
 	public static void main(String[] args) {
-		//read input file longo a string
+		//read input file into a string
 		String input = inputToString("src/Day14_2024_12_14/input.txt");
 
 		String[] robots = input.split("\n");

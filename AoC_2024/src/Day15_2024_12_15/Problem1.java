@@ -6,7 +6,7 @@ import java.io.FileReader;
 public class Problem1 {
 	
 	public static void main(String[] args) {
-		//read input file longo a string
+		//read input file into a string
 		String input = inputToString("src/Day15_2024_12_15/input.txt");
 
 		String mapString = input.split("\n\n")[0];

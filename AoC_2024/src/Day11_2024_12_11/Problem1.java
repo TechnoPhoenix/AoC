@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Problem1 {
 	
 	public static void main(String[] args) {
-		//read input file longo a string
+		//read input file into a string
 		String input = inputToString("src/Day11_2024_12_11/input.txt");
 
 		//split input into multiple stones stored in array

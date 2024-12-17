@@ -9,7 +9,7 @@ import java.util.Map;
 public class Problem2 {
 	
 	public static void main(String[] args) {
-		//read input file longo a string
+		//read input file into a string
 		String input = inputToString("src/Day12_2024_12_12/input.txt");
 
 		//turn input string into 2d char array
