@@ -3,12 +3,18 @@ package Day16_2024_12_16;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
+import java.util.Map;
 
-public class Problem1 {
-
+public class Problem2 {
+	
 	private record Coords(int xPos, int yPos) {}
+
+	private enum Direction {
+		NORTH, EAST, SOUTH, WEST
+	}
 	
 	static HashMap<Coords, Integer> reachedLocations;
+	static HashMap<boolean[][], Integer> possiblePaths;
 	
 	public static void main(String[] args) {
 		//read input file into a string
@@ -59,22 +65,52 @@ public class Problem1 {
 		preVisited[xPos][yPos] = true;
 
 		reachedLocations = new HashMap<Coords, Integer>();
+		possiblePaths = new HashMap<boolean[][], Integer>();
 
-		int north = traverseMap(map, 1001, preVisited, xPos, yPos - 1, "NORTH");
-		int south = traverseMap(map, 1001, preVisited, xPos, yPos + 1, "SOUTH");
-		int east  = traverseMap(map, 0001, preVisited, xPos + 1, yPos, "EAST" );
-		int west  = traverseMap(map, 2001, preVisited, xPos - 1, yPos, "WEST" );
+		int north = traverseMap(map, 1001, preVisited, xPos, yPos - 1, Direction.NORTH);
+		int south = traverseMap(map, 1001, preVisited, xPos, yPos + 1, Direction.SOUTH);
+		int east  = traverseMap(map, 0001, preVisited, xPos + 1, yPos, Direction.EAST );
+		int west  = traverseMap(map, 2001, preVisited, xPos - 1, yPos, Direction.WEST );
 		int lowestScore = Math.min(Math.min(north, south), Math.min(east, west));
 
+		//mark all tiles which are part of an optimal solution
+		boolean[][] partOfPath = new boolean[map.length][map[0].length];
+		for(int i = 0; i < partOfPath.length; i++) {
+			for(int j = 0; j < partOfPath[0].length; j++) {
+				partOfPath[i][j] = false;
+			}
+		}
+		for(Map.Entry<boolean[][], Integer> element : possiblePaths.entrySet()) {
+			if(element.getValue().intValue() == lowestScore) {
+				for(int i = 0; i < partOfPath.length; i++) {
+					for(int j = 0; j < partOfPath[0].length; j++) {
+						if(element.getKey()[i][j]) {
+							partOfPath[i][j] = true;
+						}
+					}
+				}
+			}
+		}
+
+		//count number of tiles in optimal paths
+		int tileCount = 0;
+		for(int i = 0; i < partOfPath.length; i++) {
+			for(int j = 0; j < partOfPath[0].length; j++) {
+				if(partOfPath[i][j]) {
+					tileCount++;
+				}
+			}
+		}
+
 		//output
-		System.out.println("The lowest score possible is: " + lowestScore);
+		System.out.println("The number of tiles in all optimal paths is: " + tileCount);
 	}
 
-	private static int traverseMap(char[][] map, int currentScore, boolean[][] oldPreVisited, int xPos, int yPos, String direction) {
+	private static int traverseMap(char[][] map, int currentScore, boolean[][] oldPreVisited, int xPos, int yPos, Direction direction) {
 		Coords coords = new Coords(xPos, yPos);
-		if(reachedLocations.getOrDefault(coords, Integer.MAX_VALUE).intValue() < currentScore) {
+		if(reachedLocations.getOrDefault(coords, Integer.MAX_VALUE).intValue() < (currentScore - 1000)) {
 			return Integer.MAX_VALUE;
-		} else {
+		} else if(reachedLocations.getOrDefault(coords, Integer.MAX_VALUE).intValue() > (currentScore)) {
 			reachedLocations.put(coords, Integer.valueOf(currentScore));
 		}
 
@@ -91,35 +127,37 @@ public class Problem1 {
 		if(map[xPos][yPos] == '#' || preVisited[xPos][yPos]) {
 			return result;
 		} else if(map[xPos][yPos] == 'E') {
+			preVisited[xPos][yPos] = true;
+			possiblePaths.put(preVisited, Integer.valueOf(currentScore));
 			return currentScore;
 		} else {
 			preVisited[xPos][yPos] = true;
 			switch(direction) {
-				case "NORTH":
-					forward = traverseMap(map, currentScore + 1, preVisited, xPos, yPos - 1, "NORTH");
-					right = traverseMap(map, currentScore + 1001, preVisited, xPos + 1, yPos, "EAST");
-					left = traverseMap(map, currentScore + 1001, preVisited, xPos - 1, yPos, "WEST");
+				case NORTH:
+					forward = traverseMap(map, currentScore + 1, preVisited, xPos, yPos - 1, Direction.NORTH);
+					right = traverseMap(map, currentScore + 1001, preVisited, xPos + 1, yPos, Direction.EAST);
+					left = traverseMap(map, currentScore + 1001, preVisited, xPos - 1, yPos, Direction.WEST);
 
 					result = Math.min(Math.min(right, left), forward);
 					break;
-				case "EAST":
-					forward = traverseMap(map, currentScore + 1, preVisited, xPos + 1, yPos, "EAST");
-					right = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos + 1, "SOUTH");
-					left = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos - 1, "NORTH");
+				case EAST:
+					forward = traverseMap(map, currentScore + 1, preVisited, xPos + 1, yPos, Direction.EAST);
+					right = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos + 1, Direction.SOUTH);
+					left = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos - 1, Direction.NORTH);
 
 					result = Math.min(Math.min(right, left), forward);
 					break;
-				case "SOUTH":
-					forward = traverseMap(map, currentScore + 1, preVisited, xPos, yPos + 1, "SOUTH");
-					right = traverseMap(map, currentScore + 1001, preVisited, xPos - 1, yPos, "WEST");
-					left = traverseMap(map, currentScore + 1001, preVisited, xPos + 1, yPos, "EAST");
+				case SOUTH:
+					forward = traverseMap(map, currentScore + 1, preVisited, xPos, yPos + 1, Direction.SOUTH);
+					right = traverseMap(map, currentScore + 1001, preVisited, xPos - 1, yPos, Direction.WEST);
+					left = traverseMap(map, currentScore + 1001, preVisited, xPos + 1, yPos, Direction.EAST);
 
 					result = Math.min(Math.min(right, left), forward);
 					break;
-				case "WEST":
-					forward = traverseMap(map, currentScore + 1, preVisited, xPos - 1, yPos, "WEST");
-					right = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos - 1, "NORTH");
-					left = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos + 1, "SOUTH");
+				case WEST:
+					forward = traverseMap(map, currentScore + 1, preVisited, xPos - 1, yPos, Direction.WEST);
+					right = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos - 1, Direction.NORTH);
+					left = traverseMap(map, currentScore + 1001, preVisited, xPos, yPos + 1, Direction.SOUTH);
 
 					result = Math.min(Math.min(right, left), forward);
 					break;
