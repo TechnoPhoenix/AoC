@@ -23,7 +23,7 @@ public class Problem1 {
 			program[i] = Integer.parseInt(programArr[i]);
 		}
 
-		registerA = 136904920099226l;
+		registerA = Integer.parseInt(registers[0].substring(12, registers[0].length()));;
 		registerB = Integer.parseInt(registers[1].substring(12, registers[1].length()));
 		registerC = Integer.parseInt(registers[2].substring(12, registers[2].length()));
 
