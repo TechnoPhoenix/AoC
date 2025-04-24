@@ -43,7 +43,6 @@ public class Problem2 {
 			}
 		}
 
-		ArrayList<String> sortedClique = new ArrayList<String>();
 		String result = "";
 		while(!biggestClique.isEmpty()) {
 			String current = biggestClique.get(0);
