@@ -1,7 +1,5 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ArrayList;
 
 public class Y2024_D25_P1 {
