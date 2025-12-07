@@ -18,8 +18,8 @@ fn partOne(input: []const u8) u64 {
 		if(char == ',') {
 			//between ranges
 			const r: Range = Range{.min = min, .max = max};
-			ranges.append(allocator, r) catch
-				{ std.debug.print("failed appending range", .{}); };
+			ranges.append(allocator, r) catch {
+				std.debug.print("failed appending range", .{}); };
 			toggle = false;
 			min = 0;
 			max = 0;
@@ -37,11 +37,11 @@ fn partOne(input: []const u8) u64 {
 		}
 	}
 	const r: Range = Range{.min = min, .max = max};
-	ranges.append(allocator, r) catch
-		{ std.debug.print("failed appending range", .{}); };
+	ranges.append(allocator, r) catch {
+		std.debug.print("failed appending range", .{}); };
 
 	const rangesSlice = ranges.toOwnedSlice(allocator) catch {
-		std.debug.print("failed appending range", .{});
+		std.debug.print("failed arraylist to slice", .{});
 		return 0; };
 	defer allocator.free(rangesSlice);
 	for(rangesSlice) |range| {
@@ -70,8 +70,8 @@ pub fn partTwo(input: []const u8) u64 {
 		if(char == ',') {
 			//between ranges
 			const r: Range = Range{.min = min, .max = max};
-			ranges.append(allocator, r) catch
-				{ std.debug.print("failed appending range", .{}); };
+			ranges.append(allocator, r) catch {
+				std.debug.print("failed appending range", .{}); };
 			toggle = false;
 			min = 0;
 			max = 0;
@@ -89,13 +89,13 @@ pub fn partTwo(input: []const u8) u64 {
 		}
 	}
 	const r: Range = Range{.min = min, .max = max};
-	ranges.append(allocator, r) catch
-		{ std.debug.print("failed appending range", .{}); };
+	ranges.append(allocator, r) catch {
+		std.debug.print("failed appending range", .{}); };
 
-		const rangesSlice = ranges.toOwnedSlice(allocator) catch {
-		std.debug.print("failed appending range", .{});
+	const rangesSlice = ranges.toOwnedSlice(allocator) catch {
+		std.debug.print("failed arraylist to slice", .{});
 		return 0; };
-		defer allocator.free(rangesSlice);
+	defer allocator.free(rangesSlice);
 	for(rangesSlice) |range| {
 		for(range.min..range.max) |num| {
 			if(num >= 10) {
